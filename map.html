@@ -229,6 +229,8 @@
 
             // Try multiple GeoJSON sources for better reliability
             const geojsonSources = [
+                'https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson',
+                'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson',
                 'https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson',
                 'https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json'
             ];
@@ -246,39 +248,50 @@
                         return response.json();
                     })
                     .then(data => {
-                    geojsonLayer = L.geoJSON(data, {
-                        style: feature => {
-                            const countryName = feature.properties.name;
-                            const total = playerTotals[countryName] || 0;
-                            return {
-                                weight: 1,
-                                opacity: 0.75,
-                                color: '#1f2937',
-                                dashArray: '3',
-                                fillOpacity: 0.7,
-                                fillColor: getColor(total)
-                            };
-                        },
-                        onEachFeature: (feature, layer) => {
-                            layer.on({
-                                mouseover: handleHover,
-                                mouseout: resetHover,
-                                click: zoomToFeature
-                            });
-                            const countryName = feature.properties.name;
-                            const total = playerTotals[countryName];
-                            layer.bindTooltip(
-                                total
-                                    ? `${countryName}: ${total.toLocaleString()} players`
-                                    : `${countryName}: No data`,
-                                { sticky: true }
-                            );
-                        }
-                    }).addTo(map);
+                        console.log('GeoJSON loaded successfully from source', sourceIndex);
+
+                        // Helper function to get country name from various property formats
+                        const getCountryName = (properties) => {
+                            return properties.name || properties.NAME || properties.ADMIN ||
+                                   properties.admin || properties.sovereignt || properties.SOVEREIGNT ||
+                                   properties.name_long || properties.NAME_LONG || '';
+                        };
+
+                        geojsonLayer = L.geoJSON(data, {
+                            style: feature => {
+                                const countryName = getCountryName(feature.properties);
+                                const total = playerTotals[countryName] || 0;
+                                return {
+                                    weight: 1,
+                                    opacity: 0.75,
+                                    color: '#1f2937',
+                                    dashArray: '3',
+                                    fillOpacity: 0.7,
+                                    fillColor: getColor(total)
+                                };
+                            },
+                            onEachFeature: (feature, layer) => {
+                                layer.on({
+                                    mouseover: handleHover,
+                                    mouseout: resetHover,
+                                    click: zoomToFeature
+                                });
+                                const countryName = getCountryName(feature.properties);
+                                const total = playerTotals[countryName];
+                                layer.bindTooltip(
+                                    total
+                                        ? `${countryName}: ${total.toLocaleString()} players`
+                                        : `${countryName}: No data`,
+                                    { sticky: true }
+                                );
+                            }
+                        }).addTo(map);
                     })
                     .catch(error => {
+                        console.warn(`Failed to load GeoJSON from source ${sourceIndex}:`, error);
                         // Try next source if available
                         if (sourceIndex + 1 < geojsonSources.length) {
+                            console.log(`Trying next GeoJSON source (${sourceIndex + 1})...`);
                             loadGeoJSON(sourceIndex + 1);
                         } else {
                             // All sources failed
@@ -286,7 +299,7 @@
                             errorBanner.className = 'map-error';
                             errorBanner.textContent = 'Unable to load the world map right now. Please check your connection and reload.';
                             document.querySelector('.map-section').appendChild(errorBanner);
-                            console.error('Failed to load GeoJSON:', error);
+                            console.error('Failed to load GeoJSON from all sources:', error);
                         }
                     });
             }

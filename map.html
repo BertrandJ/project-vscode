@@ -26,30 +26,50 @@
             <ul class="nav-links">
                 <li><a href="index.html#store">Store</a></li>
                 <li><a href="index.html#collections">Collections</a></li>
+                <li><a href="famous-games.html">Famous Games</a></li>
+                <li><a class="active" href="map.html">Players Map</a></li>
                 <li><a href="index.html#about">About</a></li>
                 <li><a href="index.html#support">Support</a></li>
-                <li><a class="active" href="map.html">Players Map</a></li>
             </ul>
             <a class="cta" href="index.html#store">Shop Now</a>
         </nav>
         <div class="hero-content">
             <h1>Global Player Heatmap</h1>
-            <p>Explore where the PixelPulse community is thriving and discover opportunities to expand.</p>
+            <p>Interact with our live community map to see where PixelPulse players are logging in from around the world.</p>
         </div>
     </header>
 
     <main class="map-main">
         <section class="map-section">
-            <div id="players-map" role="region" aria-label="Interactive map showing players per country"></div>
+            <div id="players-map" role="region" aria-label="Interactive PixelPulse player distribution map"></div>
             <aside class="map-sidebar">
                 <h2>Regional Highlights</h2>
-                <p>Hover over any country to reveal how many PixelPulse players call it home.</p>
-                <ul>
-                    <li>North America leads competitive leagues with strong US and Canadian communities.</li>
-                    <li>Brazil and Argentina drive rapid growth across South America.</li>
-                    <li>Germany, France, and the UK are key hubs for European esports events.</li>
-                    <li>Japan and South Korea host the highest ratio of pro-level players per capita.</li>
-                </ul>
+                <p class="map-sidebar-intro">Hover over any country to reveal its active players and click to zoom in for a closer look.</p>
+                <dl class="map-stats">
+                    <div>
+                        <dt>Top Community</dt>
+                        <dd>United States – 164,000 players</dd>
+                    </div>
+                    <div>
+                        <dt>Fastest Growth</dt>
+                        <dd>Brazil – up 18% month over month</dd>
+                    </div>
+                    <div>
+                        <dt>Esports Hubs</dt>
+                        <dd>South Korea · Germany · Japan</dd>
+                    </div>
+                    <div>
+                        <dt>New Hotspot</dt>
+                        <dd>Nigeria – 17,000 competitive players</dd>
+                    </div>
+                </dl>
+                <div class="map-controls">
+                    <button class="btn small map-btn" data-lat="20" data-lng="0" data-zoom="2">Reset View</button>
+                    <button class="btn small map-btn" data-lat="40" data-lng="-100" data-zoom="4">North America</button>
+                    <button class="btn small map-btn" data-lat="10" data-lng="-55" data-zoom="4">South America</button>
+                    <button class="btn small map-btn" data-lat="52" data-lng="10" data-zoom="4">Europe</button>
+                    <button class="btn small map-btn" data-lat="22" data-lng="90" data-zoom="4">Asia</button>
+                </div>
             </aside>
         </section>
     </main>
@@ -67,7 +87,7 @@
         <p class="copyright">© 2025 PixelPulse Games. All rights reserved.</p>
     </footer>
 
-    <script defer>
+    <script>
         window.addEventListener('DOMContentLoaded', () => {
             const playerTotals = {
                 'United States of America': 164000,
@@ -75,15 +95,19 @@
                 'Mexico': 38000,
                 'Brazil': 91000,
                 'Argentina': 27000,
+                'Chile': 16000,
                 'United Kingdom': 56000,
                 'France': 49000,
                 'Germany': 73000,
                 'Spain': 31000,
                 'Italy': 36000,
+                'Netherlands': 21000,
                 'Sweden': 19000,
                 'Norway': 12000,
                 'Finland': 14000,
                 'Poland': 28000,
+                'Turkey': 33000,
+                'United Arab Emirates': 9000,
                 'South Africa': 15000,
                 'Nigeria': 17000,
                 'Egypt': 21000,
@@ -91,100 +115,127 @@
                 'China': 132000,
                 'Japan': 76000,
                 'South Korea': 68000,
+                'Singapore': 15000,
                 'Australia': 25000,
                 'New Zealand': 9000
             };
 
-            const getColor = value => {
-                if (value > 100000) return '#ef476f';
-                if (value > 80000) return '#f78c6b';
-                if (value > 60000) return '#ffd166';
-                if (value > 40000) return '#06d6a0';
-                if (value > 20000) return '#118ab2';
-                if (value > 5000) return '#073b4c';
-                return '#dee2e6';
+            const getColor = total => {
+                if (total > 120000) return '#ef476f';
+                if (total > 90000) return '#f78c6b';
+                if (total > 60000) return '#ffd166';
+                if (total > 35000) return '#06d6a0';
+                if (total > 15000) return '#118ab2';
+                if (total > 5000) return '#073b4c';
+                return '#2f2f48';
             };
 
             const map = L.map('players-map', {
                 worldCopyJump: true,
                 maxBoundsViscosity: 1
             }).setView([20, 0], 2);
+            map.setMaxBounds([
+                [-90, -190],
+                [90, 190]
+            ]);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
 
-            const info = L.control();
+            const info = L.control({ position: 'topright' });
             info.onAdd = function () {
                 this._div = L.DomUtil.create('div', 'map-info');
                 this.update();
                 return this._div;
             };
             info.update = function (props) {
-                this._div.innerHTML = props
-                    ? `<strong>${props.name}</strong><br>${playerTotals[props.name] ? playerTotals[props.name].toLocaleString() : 'No data'} players`
-                    : 'Hover over a country';
+                if (!props) {
+                    this._div.innerHTML = '<strong>Player Spotlight</strong><br>Hover over a country';
+                    return;
+                }
+                const country = props.name;
+                const total = playerTotals[country];
+                this._div.innerHTML = total
+                    ? `<strong>${country}</strong><br>${total.toLocaleString()} players`
+                    : `<strong>${country}</strong><br>No active data yet`;
             };
             info.addTo(map);
 
             const legend = L.control({ position: 'bottomright' });
             legend.onAdd = function () {
                 const div = L.DomUtil.create('div', 'map-legend');
-                const breaks = [0, 5000, 20000, 40000, 60000, 80000, 100000];
+                const ranges = [
+                    { min: 0, max: 5000 },
+                    { min: 5001, max: 15000 },
+                    { min: 15001, max: 35000 },
+                    { min: 35001, max: 60000 },
+                    { min: 60001, max: 90000 },
+                    { min: 90001, max: 120000 },
+                    { min: 120001, max: null }
+                ];
                 div.innerHTML = '<h4>Players</h4>';
-                for (let i = 0; i < breaks.length; i++) {
-                    const from = breaks[i];
-                    const to = breaks[i + 1];
-                    div.innerHTML +=
-                        `<span><i style="background:${getColor(from + 1)}"></i>${from.toLocaleString()}${to ? '&ndash;' + to.toLocaleString() : '+'}</span>`;
-                }
+                ranges.forEach(range => {
+                    const value = (range.min + (range.max || range.min)) / 2;
+                    const label = range.max
+                        ? `${range.min.toLocaleString()}–${range.max.toLocaleString()}`
+                        : `${range.min.toLocaleString()}+`;
+                    div.innerHTML += `<span><i style="background:${getColor(value)}"></i>${label}</span>`;
+                });
                 return div;
             };
             legend.addTo(map);
 
-            fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
-                .then(response => response.json())
+            let geojsonLayer;
+
+            const handleHover = event => {
+                const layer = event.target;
+                layer.setStyle({
+                    weight: 2,
+                    color: '#ffffff',
+                    dashArray: '',
+                    fillOpacity: 0.85
+                });
+                if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                    layer.bringToFront();
+                }
+                info.update(layer.feature.properties);
+            };
+
+            const resetHover = event => {
+                geojsonLayer.resetStyle(event.target);
+                info.update();
+            };
+
+            const zoomToFeature = event => {
+                map.fitBounds(event.target.getBounds());
+            };
+
+            fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load map data');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    const highlightFeature = event => {
-                        const layer = event.target;
-                        layer.setStyle({
-                            weight: 2,
-                            color: '#ffffff',
-                            dashArray: '',
-                            fillOpacity: 0.9
-                        });
-                        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-                            layer.bringToFront();
-                        }
-                        info.update(layer.feature.properties);
-                    };
-
-                    const resetHighlight = event => {
-                        geojson.resetStyle(event.target);
-                        info.update();
-                    };
-
-                    const zoomToFeature = event => {
-                        map.fitBounds(event.target.getBounds());
-                    };
-
-                    const geojson = L.geoJSON(data, {
+                    geojsonLayer = L.geoJSON(data, {
                         style: feature => {
                             const countryName = feature.properties.name;
-                            const value = playerTotals[countryName] || 0;
+                            const total = playerTotals[countryName] || 0;
                             return {
                                 weight: 1,
-                                opacity: 0.6,
-                                color: '#ffffff',
+                                opacity: 0.75,
+                                color: '#1f2937',
                                 dashArray: '3',
-                                fillOpacity: 0.8,
-                                fillColor: getColor(value)
+                                fillOpacity: 0.7,
+                                fillColor: getColor(total)
                             };
                         },
                         onEachFeature: (feature, layer) => {
                             layer.on({
-                                mouseover: highlightFeature,
-                                mouseout: resetHighlight,
+                                mouseover: handleHover,
+                                mouseout: resetHover,
                                 click: zoomToFeature
                             });
                             const countryName = feature.properties.name;
@@ -199,11 +250,21 @@
                     }).addTo(map);
                 })
                 .catch(() => {
-                    const errorAlert = document.createElement('div');
-                    errorAlert.className = 'map-error';
-                    errorAlert.textContent = 'Unable to load the world map at the moment. Please try again later.';
-                    document.querySelector('.map-section').appendChild(errorAlert);
+                    const errorBanner = document.createElement('div');
+                    errorBanner.className = 'map-error';
+                    errorBanner.textContent = 'Unable to load the world map right now. Please check your connection and reload.';
+                    document.querySelector('.map-section').appendChild(errorBanner);
                 });
+
+            document.querySelectorAll('.map-btn').forEach(button => {
+                button.addEventListener('click', event => {
+                    const target = event.currentTarget;
+                    const lat = Number(target.dataset.lat);
+                    const lng = Number(target.dataset.lng);
+                    const zoom = Number(target.dataset.zoom);
+                    map.flyTo([lat, lng], zoom, { duration: 0.8 });
+                });
+            });
         });
     </script>
 </body>

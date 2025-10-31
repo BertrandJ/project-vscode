@@ -133,6 +133,12 @@
                 return '#2f2f48';
             };
 
+            const mapContainer = document.getElementById('players-map');
+            if (!mapContainer) {
+                console.error('Map container not found');
+                return;
+            }
+
             const map = L.map('players-map', {
                 worldCopyJump: true,
                 maxBoundsViscosity: 1
@@ -143,8 +149,14 @@
             ]);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
             }).addTo(map);
+
+            // Invalidate map size after a short delay to ensure container is fully rendered
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 100);
 
             const info = L.control({ position: 'topright' });
             info.onAdd = function () {

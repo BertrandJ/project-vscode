@@ -399,6 +399,7 @@ main {
 
 #players-map {
     width: 100%;
+    height: 600px;
     min-height: 520px;
     border-radius: 20px;
     overflow: hidden;
@@ -551,6 +552,7 @@ main {
     }
     
     #players-map {
+        height: 500px;
         min-height: 480px;
     }
 }
@@ -574,6 +576,7 @@ main {
     }
     
     #players-map {
+        height: 400px;
         min-height: 380px;
     }
     

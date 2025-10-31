@@ -15,7 +15,6 @@
         src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-o9N1j7kP5Sx3G2oEdl7DlsQRRXLMFa9YwpuGH2T6IPw="
         crossorigin=""
-        defer
     ></script>
 </head>
 <body class="map-page">
@@ -88,7 +87,11 @@
     </footer>
 
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
+        function initMap() {
+            if (typeof L === 'undefined') {
+                setTimeout(initMap, 50);
+                return;
+            }
             const playerTotals = {
                 'United States of America': 164000,
                 'Canada': 42000,
@@ -211,14 +214,25 @@
                 map.fitBounds(event.target.getBounds());
             };
 
-            fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to load map data');
-                    }
-                    return response.json();
-                })
-                .then(data => {
+            // Try multiple GeoJSON sources for better reliability
+            const geojsonSources = [
+                'https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson',
+                'https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json'
+            ];
+
+            function loadGeoJSON(sourceIndex = 0) {
+                if (sourceIndex >= geojsonSources.length) {
+                    throw new Error('All GeoJSON sources failed');
+                }
+                
+                fetch(geojsonSources[sourceIndex])
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to load map data');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
                     geojsonLayer = L.geoJSON(data, {
                         style: feature => {
                             const countryName = feature.properties.name;
@@ -248,13 +262,23 @@
                             );
                         }
                     }).addTo(map);
-                })
-                .catch(() => {
-                    const errorBanner = document.createElement('div');
-                    errorBanner.className = 'map-error';
-                    errorBanner.textContent = 'Unable to load the world map right now. Please check your connection and reload.';
-                    document.querySelector('.map-section').appendChild(errorBanner);
-                });
+                    })
+                    .catch(error => {
+                        // Try next source if available
+                        if (sourceIndex + 1 < geojsonSources.length) {
+                            loadGeoJSON(sourceIndex + 1);
+                        } else {
+                            // All sources failed
+                            const errorBanner = document.createElement('div');
+                            errorBanner.className = 'map-error';
+                            errorBanner.textContent = 'Unable to load the world map right now. Please check your connection and reload.';
+                            document.querySelector('.map-section').appendChild(errorBanner);
+                            console.error('Failed to load GeoJSON:', error);
+                        }
+                    });
+            }
+            
+            loadGeoJSON();
 
             document.querySelectorAll('.map-btn').forEach(button => {
                 button.addEventListener('click', event => {
@@ -265,7 +289,14 @@
                     map.flyTo([lat, lng], zoom, { duration: 0.8 });
                 });
             });
-        });
+        }
+
+        // Wait for both DOM and Leaflet to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initMap);
+        } else {
+            initMap();
+        }
     </script>
 </body>
 </html>

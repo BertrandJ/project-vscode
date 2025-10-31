@@ -1,15 +1,15 @@
 :root {
-    --bg: #0f172a;
-    --bg-accent: rgba(15, 23, 42, 0.8);
-    --primary: #7c3aed;
-    --primary-hover: #6d28d9;
-    --secondary: rgba(255, 255, 255, 0.14);
-    --text: #e2e8f0;
-    --muted: #94a3b8;
-    --card-bg: rgba(15, 23, 42, 0.75);
-    --border: rgba(148, 163, 184, 0.2);
-    --shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
-    --pill-bg: rgba(124, 58, 237, 0.18);
+    --bg: #1f0b0b;
+    --bg-accent: rgba(63, 12, 12, 0.85);
+    --primary: #dc2626;
+    --primary-hover: #b91c1c;
+    --secondary: rgba(255, 235, 235, 0.16);
+    --text: #fce7f3;
+    --muted: #fca5a5;
+    --card-bg: rgba(64, 17, 17, 0.75);
+    --border: rgba(248, 113, 113, 0.2);
+    --shadow: 0 24px 60px rgba(127, 29, 29, 0.35);
+    --pill-bg: rgba(220, 38, 38, 0.18);
 }
 
 * {
@@ -19,7 +19,7 @@
 body {
     margin: 0;
     font-family: "Inter", "Segoe UI", sans-serif;
-    background: radial-gradient(circle at top, #1e293b 0%, #0f172a 45%, #020617 100%);
+    background: radial-gradient(circle at top, #450a0a 0%, #1f0b0b 45%, #0b0202 100%);
     color: var(--text);
     line-height: 1.6;
 }
@@ -40,14 +40,14 @@ a:hover {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    background: url('https://images.unsplash.com/photo-1605902711622-cfb43c44367f?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+    background: url('https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
     overflow: hidden;
 }
 
 .hero .overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(120deg, rgba(15, 23, 42, 0.85) 20%, rgba(15, 23, 42, 0.35) 60%, rgba(15, 23, 42, 0.9) 100%);
+    background: linear-gradient(120deg, rgba(63, 12, 12, 0.9) 20%, rgba(127, 29, 29, 0.4) 60%, rgba(63, 12, 12, 0.92) 100%);
     z-index: 0;
 }
 
@@ -88,14 +88,14 @@ a.logo:hover {
 .cta {
     padding: 12px 20px;
     border-radius: 999px;
-    background: rgba(124, 58, 237, 0.18);
-    border: 1px solid rgba(124, 58, 237, 0.35);
+    background: rgba(220, 38, 38, 0.18);
+    border: 1px solid rgba(220, 38, 38, 0.35);
     font-weight: 600;
     transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .cta:hover {
-    background: rgba(124, 58, 237, 0.35);
+    background: rgba(220, 38, 38, 0.35);
     transform: translateY(-1px);
 }
 
@@ -148,19 +148,19 @@ a.logo:hover {
 }
 
 .btn.secondary {
-    background: rgba(148, 163, 184, 0.18);
+    background: rgba(254, 202, 202, 0.18);
     color: var(--text);
 }
 
 .btn.secondary:hover {
-    background: rgba(148, 163, 184, 0.28);
+    background: rgba(254, 202, 202, 0.32);
 }
 
 .btn.small {
     padding: 10px 18px;
     font-size: 0.9rem;
-    background: rgba(124, 58, 237, 0.2);
-    color: #fff;
+    background: rgba(220, 38, 38, 0.24);
+    color: #ffe4e6;
 }
 
 main {
@@ -188,7 +188,7 @@ main {
     border-radius: 20px;
     overflow: hidden;
     backdrop-filter: blur(18px);
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.35);
+    box-shadow: 0 18px 40px rgba(127, 29, 29, 0.35);
 }
 
 .card img {
@@ -236,7 +236,7 @@ main {
     padding: 10px 18px;
     border-radius: 999px;
     background: var(--pill-bg);
-    border: 1px solid rgba(124, 58, 237, 0.35);
+    border: 1px solid rgba(220, 38, 38, 0.35);
     font-weight: 600;
 }
 
@@ -246,7 +246,7 @@ main {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     align-items: start;
     margin-top: 96px;
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(63, 12, 12, 0.6);
     border: 1px solid var(--border);
     border-radius: 24px;
     padding: 40px;
@@ -260,10 +260,10 @@ main {
 }
 
 .about-visual {
-    background: rgba(124, 58, 237, 0.12);
+    background: rgba(220, 38, 38, 0.12);
     border-radius: 20px;
     padding: 28px;
-    border: 1px solid rgba(124, 58, 237, 0.4);
+    border: 1px solid rgba(220, 38, 38, 0.4);
 }
 
 .launch-list {
@@ -277,7 +277,7 @@ main {
     gap: 12px;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid rgba(124, 58, 237, 0.25);
+    border-bottom: 1px solid rgba(220, 38, 38, 0.25);
 }
 
 .launch-list li:last-child {
@@ -286,14 +286,14 @@ main {
 
 .launch-list span {
     font-weight: 700;
-    color: #fff;
+    color: #fee2e2;
     min-width: 70px;
 }
 
 .newsletter {
     margin-top: 96px;
     text-align: center;
-    background: rgba(15, 23, 42, 0.7);
+    background: rgba(63, 12, 12, 0.7);
     padding: 56px;
     border-radius: 24px;
     border: 1px solid var(--border);
@@ -315,20 +315,20 @@ main {
 .signup-form input {
     padding: 14px 20px;
     border-radius: 14px;
-    border: 1px solid rgba(148, 163, 184, 0.35);
-    background: rgba(2, 6, 23, 0.65);
+    border: 1px solid rgba(248, 113, 113, 0.35);
+    background: rgba(31, 11, 11, 0.65);
     color: var(--text);
     min-width: 260px;
 }
 
 .signup-form input::placeholder {
-    color: rgba(148, 163, 184, 0.75);
+    color: rgba(252, 165, 165, 0.75);
 }
 
 .footer {
     margin-top: 120px;
     padding: 48px clamp(24px, 6vw, 80px) 64px;
-    background: #020617;
+    background: #1b0404;
     display: grid;
     gap: 12px;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -345,12 +345,12 @@ main {
 }
 
 .footer a:hover {
-    color: #fff;
+    color: #fee2e2;
 }
 
 .footer p {
     margin: 0;
-    color: rgba(148, 163, 184, 0.65);
+    color: rgba(252, 165, 165, 0.65);
 }
 
 /* Navigation enhancements */
@@ -367,7 +367,7 @@ main {
     right: 0;
     bottom: -8px;
     height: 2px;
-    background: linear-gradient(90deg, rgba(124, 58, 237, 0.85), rgba(236, 72, 153, 0.85));
+    background: linear-gradient(90deg, rgba(220, 38, 38, 0.9), rgba(248, 113, 113, 0.85));
     border-radius: 2px;
 }
 
@@ -378,7 +378,7 @@ main {
 }
 
 .map-page .hero {
-    background: url('https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+    background: url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
 }
 
 .map-main {
@@ -390,7 +390,7 @@ main {
     grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
     gap: clamp(24px, 5vw, 48px);
     align-items: start;
-    background: rgba(15, 23, 42, 0.7);
+    background: rgba(63, 12, 12, 0.7);
     border: 1px solid var(--border);
     border-radius: 24px;
     box-shadow: var(--shadow);
@@ -402,8 +402,8 @@ main {
     min-height: 520px;
     border-radius: 20px;
     overflow: hidden;
-    border: 1px solid rgba(148, 163, 184, 0.18);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(248, 113, 113, 0.18);
+    box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.08);
     background: var(--card-bg);
 }
 
@@ -413,8 +413,8 @@ main {
     gap: 20px;
     padding: 28px;
     border-radius: 20px;
-    border: 1px solid rgba(124, 58, 237, 0.25);
-    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(220, 38, 38, 0.25);
+    background: rgba(63, 12, 12, 0.85);
     backdrop-filter: blur(18px);
     box-shadow: var(--shadow);
 }
@@ -437,7 +437,7 @@ main {
 
 .map-stats dt {
     font-weight: 600;
-    color: #fff;
+    color: #fee2e2;
 }
 
 .map-stats dd {
@@ -459,25 +459,25 @@ main {
 }
 
 .map-info {
-    background: rgba(2, 6, 23, 0.88);
+    background: rgba(31, 11, 11, 0.88);
     padding: 16px 18px;
     border-radius: 16px;
-    border: 1px solid rgba(124, 58, 237, 0.35);
+    border: 1px solid rgba(220, 38, 38, 0.35);
     color: var(--text);
-    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.45);
+    box-shadow: 0 16px 32px rgba(127, 29, 29, 0.45);
     font-size: 0.95rem;
     min-width: 200px;
     line-height: 1.5;
 }
 
 .map-legend {
-    background: rgba(2, 6, 23, 0.88);
+    background: rgba(31, 11, 11, 0.88);
     padding: 14px 16px;
     border-radius: 12px;
-    border: 1px solid rgba(124, 58, 237, 0.35);
+    border: 1px solid rgba(220, 38, 38, 0.35);
     color: var(--text);
     font-size: 0.85rem;
-    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.35);
+    box-shadow: 0 10px 28px rgba(127, 29, 29, 0.35);
 }
 
 .map-legend h4 {
@@ -523,11 +523,11 @@ main {
 }
 
 .leaflet-control-zoom a:hover {
-    background-color: rgba(124, 58, 237, 0.2) !important;
+    background-color: rgba(220, 38, 38, 0.2) !important;
 }
 
 .leaflet-container {
-    background: #0f172a !important;
+    background: #1f0b0b !important;
 }
 
 .leaflet-popup-content-wrapper {

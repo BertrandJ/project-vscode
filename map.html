@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelPulse Players Map</title>
+    <link rel="stylesheet" href="styles.css">
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-sA+e2atLYHsk/gsJvMxXTJLzYtC+jHgGUX2R0C2jU14="
+        crossorigin=""
+    >
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-o9N1j7kP5Sx3G2oEdl7DlsQRRXLMFa9YwpuGH2T6IPw="
+        crossorigin=""
+        defer
+    ></script>
+</head>
+<body class="map-page">
+    <header class="hero hero-compact">
+        <div class="overlay"></div>
+        <nav class="top-nav">
+            <span class="logo">PixelPulse</span>
+            <ul class="nav-links">
+                <li><a href="index.html#store">Store</a></li>
+                <li><a href="index.html#collections">Collections</a></li>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#support">Support</a></li>
+                <li><a class="active" href="map.html">Players Map</a></li>
+            </ul>
+            <a class="cta" href="index.html#store">Shop Now</a>
+        </nav>
+        <div class="hero-content">
+            <h1>Global Player Heatmap</h1>
+            <p>Explore where the PixelPulse community is thriving and discover opportunities to expand.</p>
+        </div>
+    </header>
+
+    <main class="map-main">
+        <section class="map-section">
+            <div id="players-map" role="region" aria-label="Interactive map showing players per country"></div>
+            <aside class="map-sidebar">
+                <h2>Regional Highlights</h2>
+                <p>Hover over any country to reveal how many PixelPulse players call it home.</p>
+                <ul>
+                    <li>North America leads competitive leagues with strong US and Canadian communities.</li>
+                    <li>Brazil and Argentina drive rapid growth across South America.</li>
+                    <li>Germany, France, and the UK are key hubs for European esports events.</li>
+                    <li>Japan and South Korea host the highest ratio of pro-level players per capita.</li>
+                </ul>
+            </aside>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div>
+            <h4>Need Help?</h4>
+            <p>Email <a href="mailto:support@pixelpulse.games">support@pixelpulse.games</a> or visit our FAQ.</p>
+        </div>
+        <div class="social">
+            <a href="#">Instagram</a>
+            <a href="#">Twitter</a>
+            <a href="#">Discord</a>
+        </div>
+        <p class="copyright">© 2025 PixelPulse Games. All rights reserved.</p>
+    </footer>
+
+    <script defer>
+        window.addEventListener('DOMContentLoaded', () => {
+            const playerTotals = {
+                'United States of America': 164000,
+                'Canada': 42000,
+                'Mexico': 38000,
+                'Brazil': 91000,
+                'Argentina': 27000,
+                'United Kingdom': 56000,
+                'France': 49000,
+                'Germany': 73000,
+                'Spain': 31000,
+                'Italy': 36000,
+                'Sweden': 19000,
+                'Norway': 12000,
+                'Finland': 14000,
+                'Poland': 28000,
+                'South Africa': 15000,
+                'Nigeria': 17000,
+                'Egypt': 21000,
+                'India': 82000,
+                'China': 132000,
+                'Japan': 76000,
+                'South Korea': 68000,
+                'Australia': 25000,
+                'New Zealand': 9000
+            };
+
+            const getColor = value => {
+                if (value > 100000) return '#ef476f';
+                if (value > 80000) return '#f78c6b';
+                if (value > 60000) return '#ffd166';
+                if (value > 40000) return '#06d6a0';
+                if (value > 20000) return '#118ab2';
+                if (value > 5000) return '#073b4c';
+                return '#dee2e6';
+            };
+
+            const map = L.map('players-map', {
+                worldCopyJump: true,
+                maxBoundsViscosity: 1
+            }).setView([20, 0], 2);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            const info = L.control();
+            info.onAdd = function () {
+                this._div = L.DomUtil.create('div', 'map-info');
+                this.update();
+                return this._div;
+            };
+            info.update = function (props) {
+                this._div.innerHTML = props
+                    ? `<strong>${props.name}</strong><br>${playerTotals[props.name] ? playerTotals[props.name].toLocaleString() : 'No data'} players`
+                    : 'Hover over a country';
+            };
+            info.addTo(map);
+
+            const legend = L.control({ position: 'bottomright' });
+            legend.onAdd = function () {
+                const div = L.DomUtil.create('div', 'map-legend');
+                const breaks = [0, 5000, 20000, 40000, 60000, 80000, 100000];
+                div.innerHTML = '<h4>Players</h4>';
+                for (let i = 0; i < breaks.length; i++) {
+                    const from = breaks[i];
+                    const to = breaks[i + 1];
+                    div.innerHTML +=
+                        `<span><i style="background:${getColor(from + 1)}"></i>${from.toLocaleString()}${to ? '&ndash;' + to.toLocaleString() : '+'}</span>`;
+                }
+                return div;
+            };
+            legend.addTo(map);
+
+            fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
+                .then(response => response.json())
+                .then(data => {
+                    const highlightFeature = event => {
+                        const layer = event.target;
+                        layer.setStyle({
+                            weight: 2,
+                            color: '#ffffff',
+                            dashArray: '',
+                            fillOpacity: 0.9
+                        });
+                        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                            layer.bringToFront();
+                        }
+                        info.update(layer.feature.properties);
+                    };
+
+                    const resetHighlight = event => {
+                        geojson.resetStyle(event.target);
+                        info.update();
+                    };
+
+                    const zoomToFeature = event => {
+                        map.fitBounds(event.target.getBounds());
+                    };
+
+                    const geojson = L.geoJSON(data, {
+                        style: feature => {
+                            const countryName = feature.properties.name;
+                            const value = playerTotals[countryName] || 0;
+                            return {
+                                weight: 1,
+                                opacity: 0.6,
+                                color: '#ffffff',
+                                dashArray: '3',
+                                fillOpacity: 0.8,
+                                fillColor: getColor(value)
+                            };
+                        },
+                        onEachFeature: (feature, layer) => {
+                            layer.on({
+                                mouseover: highlightFeature,
+                                mouseout: resetHighlight,
+                                click: zoomToFeature
+                            });
+                            const countryName = feature.properties.name;
+                            const total = playerTotals[countryName];
+                            layer.bindTooltip(
+                                total
+                                    ? `${countryName}: ${total.toLocaleString()} players`
+                                    : `${countryName}: No data`,
+                                { sticky: true }
+                            );
+                        }
+                    }).addTo(map);
+                })
+                .catch(() => {
+                    const errorAlert = document.createElement('div');
+                    errorAlert.className = 'map-error';
+                    errorAlert.textContent = 'Unable to load the world map at the moment. Please try again later.';
+                    document.querySelector('.map-section').appendChild(errorAlert);
+                });
+        });
+    </script>
+</body>
+</html>
